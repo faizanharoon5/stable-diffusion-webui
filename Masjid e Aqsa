@@ -1,0 +1,28 @@
+from moviepy.editor import *
+import numpy as np
+import cv2
+
+# Function to draw rain effect dynamically
+def rain_frame(t, size=(1280, 720), drop_count=400):
+    frame = np.zeros((size[1], size[0], 3), dtype=np.uint8)
+    np.random.seed(int(t * 100))  # change rain pattern every frame
+    for _ in range(drop_count):
+        x = np.random.randint(0, size[0])
+        y = np.random.randint(0, size[1])
+        length = np.random.randint(10, 20)
+        cv2.line(frame, (x, y), (x, y + length), (255, 255, 255), 1)
+    return frame
+
+# Create a VideoClip from rain_frame function
+rain_clip = VideoClip(lambda t: rain_frame(t), duration=8).set_opacity(0.3)
+
+# Load and prepare background image
+image_path = "/mnt/data/A_photograph_captures_the_Dome_of_the_Rock_during_.png"
+background = ImageClip(image_path).resize((1280, 720)).set_duration(8)
+
+# Combine background and rain
+final_video = CompositeVideoClip([background, rain_clip])
+
+# Export video
+output_path = "/mnt/data/masjid_aqsa_rain_effect_video.mp4"
+final_video.write_videofile(output_path, fps=24)
